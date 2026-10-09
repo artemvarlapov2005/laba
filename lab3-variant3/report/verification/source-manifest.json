@@ -1,0 +1,374 @@
+[
+  {
+    "index": 17,
+    "kind": "paragraph",
+    "text": "Цель работы",
+    "bold": true
+  },
+  {
+    "index": 18,
+    "kind": "paragraph",
+    "text": "Научиться выполнять интеграционное тестирование ПО.",
+    "bold": false
+  },
+  {
+    "index": 19,
+    "kind": "paragraph",
+    "text": "Задание",
+    "bold": true
+  },
+  {
+    "index": 20,
+    "kind": "paragraph",
+    "text": "Сформировать иерархию классов вокруг ранее протестированного класса. Провести модульное тестирование написанных классов и инкрементальное интеграционное тестирование сверху вниз с использованием программных заглушек для имитации ещё не подключённых классов нижнего уровня.",
+    "bold": false
+  },
+  {
+    "index": 21,
+    "kind": "paragraph",
+    "text": "Для варианта 3 исходным является класс «Строка» TextLine из лабораторной работы №2. В лабораторной работе №3 отдельного списка вариантов нет, поэтому ссылка на класс из лабораторной №3 трактуется как ссылка на ранее протестированный класс из лабораторной №2.",
+    "bold": false
+  },
+  {
+    "index": 22,
+    "kind": "paragraph",
+    "text": "Выполнение работы",
+    "bold": true
+  },
+  {
+    "index": 23,
+    "kind": "paragraph",
+    "text": "1 Иерархия и взаимодействие классов",
+    "bold": true
+  },
+  {
+    "index": 24,
+    "kind": "paragraph",
+    "text": "TextLine является базовым классом строки. Классы RussianTextLine и EnglishTextLine наследуют TextLine и задают язык при создании объекта. TextDocument является агрегирующим классом: он хранит список объектов TextLine и суммирует их текущие длины.",
+    "bold": false
+  },
+  {
+    "index": 25,
+    "kind": "paragraph",
+    "text": "Связи классов: RussianTextLine → TextLine и EnglishTextLine → TextLine являются наследованием; TextDocument → список TextLine является агрегацией. При вычислении длины документа вызывается getLength() каждого объекта строки.",
+    "bold": false
+  },
+  {
+    "index": 26,
+    "kind": "table",
+    "cells": [
+      [
+        "Класс",
+        "Назначение"
+      ],
+      [
+        "TextLine",
+        "Базовый класс строки: хранит массив символов, длину и язык; поддерживает изменение длины и конкатенацию."
+      ],
+      [
+        "RussianTextLine",
+        "Наследник TextLine, задающий язык «Русский» при создании объекта."
+      ],
+      [
+        "EnglishTextLine",
+        "Наследник TextLine, задающий язык «Английский» при создании объекта."
+      ],
+      [
+        "TextDocument",
+        "Агрегирующий класс, хранящий список строк и вычисляющий суммарную длину документа."
+      ],
+      [
+        "TextLineStub",
+        "Программная заглушка для верхнеуровневого тестирования TextDocument."
+      ]
+    ]
+  },
+  {
+    "index": 28,
+    "kind": "paragraph",
+    "text": "2 Реализация классов",
+    "bold": true
+  },
+  {
+    "index": 29,
+    "kind": "paragraph",
+    "text": "Базовый класс TextLine перенесён из лабораторной работы №2. Некорректные аргументы обрабатываются через IllegalArgumentException. Наследники задают фиксированный язык, а TextDocument добавляет проверку null при добавлении строки.",
+    "bold": false
+  },
+  {
+    "index": 30,
+    "kind": "paragraph",
+    "text": "TextLine.java",
+    "bold": true
+  },
+  {
+    "index": 31,
+    "kind": "code",
+    "file": "src/TextLine.java",
+    "sha256": "806f66b65a9486d4918498232ae63f09fc8712b3d5c32d74fa18cedbdab7ebb3",
+    "text": "import java.util.Arrays;\n \npublic class TextLine {\n    private int length;\n    private char[] characters;\n    private String language;\n \n    public TextLine(String text, String language) {\n        if (text == null) {\n            throw new IllegalArgumentException(\"Text must not be null\");\n        }\n        setLanguage(language);\n        characters = text.toCharArray();\n        length = characters.length;\n    }\n \n    public int getLength() {\n        return length;\n    }\n \n    public void setLength(int length) {\n        if (length < 0) {\n            throw new IllegalArgumentException(\"Length must not be negative\");\n        }\n        characters = Arrays.copyOf(characters, length);\n        this.length = characters.length;\n    }\n \n    public String getLanguage() {\n        return language;\n    }\n \n    public void setLanguage(String language) {\n        if (language == null || language.trim().isEmpty()) {\n            throw new IllegalArgumentException(\"Language must not be empty\");\n        }\n        this.language = language;\n    }\n \n    public void append(TextLine other) {\n        if (other == null) {\n            throw new IllegalArgumentException(\"Other line must not be null\");\n        }\n        char[] result = Arrays.copyOf(characters, length + other.length);\n        System.arraycopy(other.characters, 0, result, length, other.length);\n        characters = result;\n        length = characters.length;\n    }\n}"
+  },
+  {
+    "index": 33,
+    "kind": "paragraph",
+    "text": "RussianTextLine.java",
+    "bold": true
+  },
+  {
+    "index": 34,
+    "kind": "code",
+    "file": "src/RussianTextLine.java",
+    "sha256": "4f0cdc9a7afad9a28b3e2894a08cb3e7259ccd7d915750e2cb647a3660d449aa",
+    "text": "public class RussianTextLine extends TextLine {\n    public RussianTextLine(String text) {\n        super(text, \"Русский\");\n    }\n}"
+  },
+  {
+    "index": 36,
+    "kind": "paragraph",
+    "text": "EnglishTextLine.java",
+    "bold": true
+  },
+  {
+    "index": 37,
+    "kind": "code",
+    "file": "src/EnglishTextLine.java",
+    "sha256": "312530ecac11bc142474c74c944a68e2ace53d6a7de92c6ab47372176fd042c0",
+    "text": "public class EnglishTextLine extends TextLine {\n    public EnglishTextLine(String text) {\n        super(text, \"Английский\");\n    }\n}"
+  },
+  {
+    "index": 39,
+    "kind": "paragraph",
+    "text": "TextDocument.java",
+    "bold": true
+  },
+  {
+    "index": 40,
+    "kind": "code",
+    "file": "src/TextDocument.java",
+    "sha256": "3a3519266d3e9dc8d28c6e21f2cd3ff51bece91583e32718aabb4d08453a0dff",
+    "text": "import java.util.ArrayList;\nimport java.util.List;\n \npublic class TextDocument {\n    private final List<TextLine> lines = new ArrayList<>();\n \n    public void addLine(TextLine line) {\n        if (line == null) {\n            throw new IllegalArgumentException(\"Line must not be null\");\n        }\n        lines.add(line);\n    }\n \n    public int getLength() {\n        int length = 0;\n        for (TextLine line : lines) {\n            length += line.getLength();\n        }\n        return length;\n    }\n}"
+  },
+  {
+    "index": 42,
+    "kind": "paragraph",
+    "text": "3 Заглушка и тестирование сверху вниз",
+    "bold": true
+  },
+  {
+    "index": 43,
+    "kind": "paragraph",
+    "text": "На первом этапе проверяется верхний класс TextDocument. Настоящие строки заменяются объектами TextLineStub. Переопределённый метод getLength() возвращает заданное тестом число независимо от внутреннего массива символов. Наследование используется для совместимости с интерфейсом TextLine.",
+    "bold": false
+  },
+  {
+    "index": 44,
+    "kind": "paragraph",
+    "text": "TextLineStub.java",
+    "bold": true
+  },
+  {
+    "index": 45,
+    "kind": "code",
+    "file": "src/TextLineStub.java",
+    "sha256": "d75aa3b1059d6d2049a60a53698023735749c20676932374402509729bf1d102",
+    "text": "public class TextLineStub extends TextLine {\n    private final int fixedLength;\n \n    public TextLineStub(int fixedLength) {\n        super(\"\", \"Заглушка\");\n        this.fixedLength = fixedLength;\n    }\n \n    @Override\n    public int getLength() {\n        return fixedLength;\n    }\n}"
+  },
+  {
+    "index": 47,
+    "kind": "paragraph",
+    "text": "Этап 1: TextDocumentTest проверяет пустой документ, одну заглушку, сумму длин нескольких заглушек и отклонение null. Так проверяется логика документа до подключения настоящих строк.",
+    "bold": false
+  },
+  {
+    "index": 48,
+    "kind": "paragraph",
+    "text": "Этап 2: в тесте documentWorksWithRealTextLines заглушки заменяются настоящими объектами TextLine. Проверяется сумма длин строк «abc» и «de», равная 5 символам.",
+    "bold": false
+  },
+  {
+    "index": 49,
+    "kind": "paragraph",
+    "text": "Этап 3: в тестах documentWorksWithBothSubclasses и documentReflectsChangesInItsLines подключаются наследники. Проверяется сумма длин русской и английской строк, а также изменение длины документа после append() и setLength() у сохранённой строки.",
+    "bold": false
+  },
+  {
+    "index": 50,
+    "kind": "paragraph",
+    "text": "4 Модульные тесты",
+    "bold": true
+  },
+  {
+    "index": 51,
+    "kind": "paragraph",
+    "text": "Написаны тесты всех четырёх классов программы. Всего подготовлено 24 модульных теста. Проверяются корректные данные, пустые строки, граничные длины и ошибочные аргументы.",
+    "bold": false
+  },
+  {
+    "index": 52,
+    "kind": "table",
+    "cells": [
+      [
+        "Тестовый класс",
+        "Количество тестов",
+        "Что проверяется"
+      ],
+      [
+        "TextLineTest",
+        "14",
+        "Проверка конструктора, изменения языка, длины, конкатенации и ошибочных аргументов."
+      ],
+      [
+        "RussianTextLineTest",
+        "3",
+        "Проверка языка, длины пустой строки и обработки null."
+      ],
+      [
+        "EnglishTextLineTest",
+        "3",
+        "Проверка языка, длины пустой строки и обработки null."
+      ],
+      [
+        "TextDocumentTest",
+        "4",
+        "Верхнеуровневая проверка документа с программными заглушками."
+      ],
+      [
+        "TextDocumentIntegrationTest",
+        "3",
+        "Проверка взаимодействия документа с настоящими строками и наследниками."
+      ]
+    ]
+  },
+  {
+    "index": 54,
+    "kind": "paragraph",
+    "text": "TextLineTest.java",
+    "bold": true
+  },
+  {
+    "index": 55,
+    "kind": "code",
+    "file": "src/TextLineTest.java",
+    "sha256": "748a79b17ead8f83325d3e4ccd0627af0d1210f26ed6c919b072950310b5e93e",
+    "text": "import java.lang.reflect.Field;\nimport org.junit.Test;\n \nimport static org.junit.Assert.*;\n \npublic class TextLineTest {\n    private char[] charactersOf(TextLine line) throws Exception {\n        Field field = TextLine.class.getDeclaredField(\"characters\");\n        field.setAccessible(true);\n        return (char[]) field.get(line);\n    }\n \n    @Test\n    public void constructorStoresFields() throws Exception {\n        TextLine line = new TextLine(\"Привет\", \"Русский\");\n        assertEquals(6, line.getLength());\n        assertEquals(\"Русский\", line.getLanguage());\n        assertArrayEquals(\"Привет\".toCharArray(), charactersOf(line));\n    }\n \n    @Test\n    public void emptyTextHasZeroLength() throws Exception {\n        TextLine line = new TextLine(\"\", \"Русский\");\n        assertEquals(0, line.getLength());\n        assertArrayEquals(new char[0], charactersOf(line));\n    }\n \n    @Test\n    public void languageCanBeChanged() {\n        TextLine line = new TextLine(\"abc\", \"Русский\");\n        line.setLanguage(\"Английский\");\n        assertEquals(\"Английский\", line.getLanguage());\n        assertEquals(3, line.getLength());\n    }\n \n    @Test\n    public void lengthCanBeReducedIncreasedAndSetToZero() throws Exception {\n        TextLine line = new TextLine(\"abc\", \"Английский\");\n        line.setLength(2);\n        assertEquals(2, line.getLength());\n        assertArrayEquals(new char[] {'a', 'b'}, charactersOf(line));\n        line.setLength(4);\n        assertEquals(4, line.getLength());\n        assertArrayEquals(new char[] {'a', 'b', '\\0', '\\0'}, charactersOf(line));\n        line.setLength(0);\n        assertEquals(0, line.getLength());\n        assertArrayEquals(new char[0], charactersOf(line));\n    }\n \n    @Test\n    public void appendCopiesCharactersAndRecalculatesLength() throws Exception {\n        TextLine first = new TextLine(\"Привет, \", \"Русский\");\n        TextLine second = new TextLine(\"world\", \"Английский\");\n        first.append(second);\n        assertEquals(13, first.getLength());\n        assertArrayEquals(\"Привет, world\".toCharArray(), charactersOf(first));\n        assertEquals(\"Русский\", first.getLanguage());\n        assertEquals(5, second.getLength());\n        assertArrayEquals(\"world\".toCharArray(), charactersOf(second));\n    }\n \n    @Test\n    public void appendHandlesEmptyLines() throws Exception {\n        TextLine line = new TextLine(\"\", \"Английский\");\n        line.append(new TextLine(\"abc\", \"Английский\"));\n        line.append(new TextLine(\"\", \"Английский\"));\n        assertEquals(3, line.getLength());\n        assertArrayEquals(\"abc\".toCharArray(), charactersOf(line));\n    }\n \n    @Test\n    public void lineCanBeAppendedToItself() throws Exception {\n        TextLine line = new TextLine(\"ab\", \"Английский\");\n        line.append(line);\n        assertEquals(4, line.getLength());\n        assertArrayEquals(\"abab\".toCharArray(), charactersOf(line));\n    }\n \n    @Test(expected = IllegalArgumentException.class)\n    public void constructorRejectsNullText() {\n        new TextLine(null, \"Русский\");\n    }\n \n    @Test(expected = IllegalArgumentException.class)\n    public void constructorRejectsNullLanguage() {\n        new TextLine(\"abc\", null);\n    }\n \n    @Test(expected = IllegalArgumentException.class)\n    public void constructorRejectsEmptyLanguage() {\n        new TextLine(\"abc\", \"\");\n    }\n \n    @Test(expected = IllegalArgumentException.class)\n    public void setterRejectsBlankLanguage() {\n        new TextLine(\"abc\", \"Русский\").setLanguage(\"   \");\n    }\n \n    @Test(expected = IllegalArgumentException.class)\n    public void setterRejectsNullLanguage() {\n        new TextLine(\"abc\", \"Русский\").setLanguage(null);\n    }\n \n    @Test(expected = IllegalArgumentException.class)\n    public void lengthCannotBeNegative() {\n        new TextLine(\"abc\", \"Английский\").setLength(-1);\n    }\n \n    @Test(expected = IllegalArgumentException.class)\n    public void appendRejectsNull() {\n        new TextLine(\"abc\", \"Английский\").append(null);\n    }\n}"
+  },
+  {
+    "index": 57,
+    "kind": "paragraph",
+    "text": "RussianTextLineTest.java",
+    "bold": true
+  },
+  {
+    "index": 58,
+    "kind": "code",
+    "file": "src/RussianTextLineTest.java",
+    "sha256": "280d04ab2edc118f4f05768544781810503070cf0b0bc42084bb875525ac1c4a",
+    "text": "import org.junit.Test;\nimport static org.junit.Assert.assertEquals;\n \npublic class RussianTextLineTest {\n    @Test\n    public void constructorSetsLanguageAndLength() {\n        RussianTextLine line = new RussianTextLine(\"Привет\");\n        assertEquals(\"Русский\", line.getLanguage());\n        assertEquals(6, line.getLength());\n    }\n \n    @Test\n    public void emptyLineHasZeroLength() {\n        assertEquals(0, new RussianTextLine(\"\").getLength());\n    }\n \n    @Test(expected = IllegalArgumentException.class)\n    public void constructorRejectsNullText() {\n        new RussianTextLine(null);\n    }\n}"
+  },
+  {
+    "index": 60,
+    "kind": "paragraph",
+    "text": "EnglishTextLineTest.java",
+    "bold": true
+  },
+  {
+    "index": 61,
+    "kind": "code",
+    "file": "src/EnglishTextLineTest.java",
+    "sha256": "e9be96c163ec79d4a692665403f13ad61b0011655360beb17ee63fca36e3bf7e",
+    "text": "import org.junit.Test;\nimport static org.junit.Assert.assertEquals;\n \npublic class EnglishTextLineTest {\n    @Test\n    public void constructorSetsLanguageAndLength() {\n        EnglishTextLine line = new EnglishTextLine(\"hello\");\n        assertEquals(\"Английский\", line.getLanguage());\n        assertEquals(5, line.getLength());\n    }\n \n    @Test\n    public void emptyLineHasZeroLength() {\n        assertEquals(0, new EnglishTextLine(\"\").getLength());\n    }\n \n    @Test(expected = IllegalArgumentException.class)\n    public void constructorRejectsNullText() {\n        new EnglishTextLine(null);\n    }\n}"
+  },
+  {
+    "index": 63,
+    "kind": "paragraph",
+    "text": "TextDocumentTest.java",
+    "bold": true
+  },
+  {
+    "index": 64,
+    "kind": "code",
+    "file": "src/TextDocumentTest.java",
+    "sha256": "c2fd397d4bd23faf9b2ad3070f67fd391dbc3905f021e4efa7df1a86eaeafea6",
+    "text": "import org.junit.Test;\nimport static org.junit.Assert.assertEquals;\n \npublic class TextDocumentTest {\n    @Test\n    public void emptyDocumentHasZeroLength() {\n        assertEquals(0, new TextDocument().getLength());\n    }\n \n    @Test\n    public void documentUsesLengthProvidedByStub() {\n        TextDocument document = new TextDocument();\n        document.addLine(new TextLineStub(7));\n        assertEquals(7, document.getLength());\n    }\n \n    @Test\n    public void documentSumsStubLengths() {\n        TextDocument document = new TextDocument();\n        document.addLine(new TextLineStub(3));\n        document.addLine(new TextLineStub(0));\n        document.addLine(new TextLineStub(5));\n        assertEquals(8, document.getLength());\n    }\n \n    @Test(expected = IllegalArgumentException.class)\n    public void documentRejectsNullLine() {\n        new TextDocument().addLine(null);\n    }\n}"
+  },
+  {
+    "index": 66,
+    "kind": "paragraph",
+    "text": "5 Интеграционные тесты",
+    "bold": true
+  },
+  {
+    "index": 67,
+    "kind": "paragraph",
+    "text": "Три интеграционных теста проверяют взаимодействие документа с настоящим базовым классом и наследниками, включая пересчёт общей длины после изменения строки.",
+    "bold": false
+  },
+  {
+    "index": 68,
+    "kind": "paragraph",
+    "text": "TextDocumentIntegrationTest.java",
+    "bold": true
+  },
+  {
+    "index": 69,
+    "kind": "code",
+    "file": "src/TextDocumentIntegrationTest.java",
+    "sha256": "22d62385436caa15277ead96cdc763ebae7c89f36cb20c52cb6777d02dc11b68",
+    "text": "import org.junit.Test;\nimport static org.junit.Assert.assertEquals;\n \npublic class TextDocumentIntegrationTest {\n    @Test\n    public void documentWorksWithRealTextLines() {\n        TextDocument document = new TextDocument();\n        document.addLine(new TextLine(\"abc\", \"Английский\"));\n        document.addLine(new TextLine(\"de\", \"Английский\"));\n        assertEquals(5, document.getLength());\n    }\n \n    // Этап 3: подключены классы-наследники.\n    @Test\n    public void documentWorksWithBothSubclasses() {\n        TextDocument document = new TextDocument();\n        document.addLine(new RussianTextLine(\"Привет\"));\n        document.addLine(new EnglishTextLine(\"hello\"));\n        assertEquals(11, document.getLength());\n    }\n \n    @Test\n    public void documentReflectsChangesInItsLines() {\n        TextDocument document = new TextDocument();\n        RussianTextLine line = new RussianTextLine(\"Привет\");\n        document.addLine(line);\n        assertEquals(6, document.getLength());\n        line.append(new RussianTextLine(\"!\"));\n        assertEquals(7, document.getLength());\n        line.setLength(2);\n        assertEquals(2, document.getLength());\n    }\n}"
+  },
+  {
+    "index": 71,
+    "kind": "paragraph",
+    "text": "6 Результаты тестирования",
+    "bold": true
+  },
+  {
+    "index": 72,
+    "kind": "paragraph",
+    "text": "Сначала отдельно запущена проверка верхнего класса с заглушками. Все 4 теста прошли успешно.",
+    "bold": false
+  },
+  {
+    "index": 73,
+    "kind": "paragraph",
+    "text": "Результат проверки TextDocument с программными заглушками",
+    "bold": true
+  },
+  {
+    "index": 74,
+    "kind": "code",
+    "file": "results/stub-tests.txt",
+    "sha256": "98abf432206bf36c5822f10590be5e533d172cfd4538cadd0f869f12883c2522",
+    "text": "JUnit version 4.13.2\n....\nTime: 0.008\nOK (4 tests)"
+  },
+  {
+    "index": 76,
+    "kind": "paragraph",
+    "text": "Затем запущен полный набор модульных и интеграционных тестов через JUnitCore из JUnit 4.13.2. Все 27 тестов прошли успешно.",
+    "bold": false
+  },
+  {
+    "index": 77,
+    "kind": "paragraph",
+    "text": "Результат выполнения полного набора тестов",
+    "bold": true
+  },
+  {
+    "index": 78,
+    "kind": "code",
+    "file": "results/all-tests.txt",
+    "sha256": "702c78913c48cb7d12a552db5039a047da39ed6e50890887a8981a9d8b00db5c",
+    "text": "JUnit version 4.13.2\n...........................\nTime: 0.015\nOK (27 tests)"
+  },
+  {
+    "index": 80,
+    "kind": "paragraph",
+    "text": "Вывод",
+    "bold": true
+  },
+  {
+    "index": 81,
+    "kind": "paragraph",
+    "text": "Удалось научиться выполнять интеграционное тестирование ПО",
+    "bold": false
+  }
+]

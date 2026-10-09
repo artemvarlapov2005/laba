@@ -1,0 +1,162 @@
+% ЛР №3. Содержание перенесено из пользовательского DOCX без редакции.
+% Компилятор: XeLaTeX. Единый согласованный шаблон mietlab.
+\documentclass{mietlab}
+\LabSetup{
+  number=3,
+  title={«Интеграционное тестирование»},
+  variant={Вариант 3},
+  student={Варлапов Артем},
+  group={П-42},
+  studentline={студент группы П-42},
+  institute={Институт системной и программной инженерии и информационных технологий},
+  discipline={Основы программной инженерии},
+  city={Москва},
+  year={2026}
+}
+\begin{document}
+\MakeLabTitle
+\LabHeading{Цель работы}
+
+Научиться выполнять интеграционное тестирование ПО.\par
+
+\LabHeading{Задание}
+
+Сформировать иерархию классов вокруг ранее протестированного класса. Провести модульное тестирование написанных классов и инкрементальное интеграционное тестирование сверху вниз с использованием программных заглушек для имитации ещё не подключённых классов нижнего уровня.\par
+
+Для варианта 3 исходным является класс «Строка» TextLine из лабораторной работы №2. В лабораторной работе №3 отдельного списка вариантов нет, поэтому ссылка на класс из лабораторной №3 трактуется как ссылка на ранее протестированный класс из лабораторной №2.\par
+
+\LabHeading{Выполнение работы}
+
+\LabHeading{1 Иерархия и взаимодействие классов}
+
+\begin{sloppypar}
+TextLine является базовым классом строки. Классы RussianTextLine и EnglishTextLine наследуют TextLine и задают язык при создании объекта. TextDocument является агрегирующим классом: он хранит список объектов TextLine и суммирует их текущие длины.\par
+\end{sloppypar}
+
+Связи классов: RussianTextLine → TextLine и EnglishTextLine → TextLine являются наследованием; TextDocument → список TextLine является агрегацией. При вычислении длины документа вызывается getLength() каждого объекта строки.\par
+
+\begin{labtable}{|L{140bp}|L{\dimexpr\linewidth-140bp-\arrayrulewidth\relax}|}
+\hline
+\LabTableHead{Класс} & \LabTableHead{Назначение} \\\hline
+\endfirsthead
+\hline
+\LabTableHead{Класс} & \LabTableHead{Назначение} \\\hline
+\endhead
+TextLine & Базовый класс строки: хранит массив символов, длину и язык; поддерживает изменение длины и конкатенацию. \\\hline
+RussianTextLine & Наследник TextLine, задающий язык «Русский» при создании объекта. \\\hline
+EnglishTextLine & Наследник TextLine, задающий язык «Английский» при создании объекта. \\\hline
+TextDocument & Агрегирующий класс, хранящий список строк и вычисляющий суммарную длину документа. \\\hline
+TextLineStub & Программная заглушка для верхнеуровневого тестирования TextDocument. \\\hline
+\end{labtable}
+
+\LabHeading{2 Реализация классов}
+
+Базовый класс TextLine перенесён из лабораторной работы №2. Некорректные аргументы обрабатываются через IllegalArgumentException. Наследники задают фиксированный язык, а TextDocument добавляет проверку null при добавлении строки.\par
+
+\Needspace{156bp}
+\LabHeading{TextLine.java}
+
+\LabCodeFile[language=Java]{src/TextLine.java}
+
+\Needspace{156bp}
+\LabHeading{RussianTextLine.java}
+
+\LabCodeFile[language=Java]{src/RussianTextLine.java}
+
+\Needspace{156bp}
+\LabHeading{EnglishTextLine.java}
+
+\LabCodeFile[language=Java]{src/EnglishTextLine.java}
+
+\Needspace{156bp}
+\LabHeading{TextDocument.java}
+
+\LabCodeFile[language=Java]{src/TextDocument.java}
+
+\LabHeading{3 Заглушка и тестирование сверху вниз}
+
+На первом этапе проверяется верхний класс TextDocument. Настоящие строки заменяются объектами TextLineStub. Переопределённый метод getLength() возвращает заданное тестом число независимо от внутреннего массива символов. Наследование используется для совместимости с интерфейсом TextLine.\par
+
+\Needspace{156bp}
+\LabHeading{TextLineStub.java}
+
+\LabCodeFile[language=Java]{src/TextLineStub.java}
+
+Этап 1: TextDocumentTest проверяет пустой документ, одну заглушку, сумму длин нескольких заглушек и отклонение null. Так проверяется логика документа до подключения настоящих строк.\par
+
+Этап 2: в тесте documentWorksWithRealTextLines заглушки заменяются настоящими объектами TextLine. Проверяется сумма длин строк «abc» и «de», равная 5 символам.\par
+
+\begin{sloppypar}
+Этап 3: в тестах documentWorksWithBothSubclasses и documentReflectsChangesInItsLines подключаются наследники. Проверяется сумма длин русской и английской строк, а также изменение длины документа после append() и setLength() у сохранённой строки.\par
+\end{sloppypar}
+
+\Needspace{475bp}
+\LabHeading{4 Модульные тесты}
+
+Написаны тесты всех четырёх классов программы. Всего подготовлено 24 модульных теста. Проверяются корректные данные, пустые строки, граничные длины и ошибочные аргументы.\par
+
+\begin{labtable}{|L{175.5bp}|L{95bp}|L{\dimexpr\linewidth-270.5bp-\arrayrulewidth\relax}|}
+\hline
+\LabTableHead{Тестовый класс} & \LabTableHead{Количество тестов} & \LabTableHead{Что проверяется} \\\hline
+\endfirsthead
+\hline
+\LabTableHead{Тестовый класс} & \LabTableHead{Количество тестов} & \LabTableHead{Что проверяется} \\\hline
+\endhead
+TextLineTest & 14 & Проверка конструктора, изменения языка, длины, конкатенации и ошибочных аргументов. \\\hline
+RussianTextLineTest & 3 & Проверка языка, длины пустой строки и обработки null. \\\hline
+EnglishTextLineTest & 3 & Проверка языка, длины пустой строки и обработки null. \\\hline
+TextDocumentTest & 4 & Верхнеуровневая проверка документа с программными заглушками. \\\hline
+TextDocumentIntegrationTest & 3 & Проверка взаимодействия документа с настоящими строками и наследниками. \\\hline
+\end{labtable}
+
+\Needspace{156bp}
+\LabHeading{TextLineTest.java}
+
+\LabCodeFile[language=Java]{src/TextLineTest.java}
+
+\Needspace{156bp}
+\LabHeading{RussianTextLineTest.java}
+
+\LabCodeFile[language=Java]{src/RussianTextLineTest.java}
+
+\Needspace{156bp}
+\LabHeading{EnglishTextLineTest.java}
+
+\LabCodeFile[language=Java]{src/EnglishTextLineTest.java}
+
+\Needspace{156bp}
+\LabHeading{TextDocumentTest.java}
+
+\LabCodeFile[language=Java]{src/TextDocumentTest.java}
+
+\LabHeading{5 Интеграционные тесты}
+
+Три интеграционных теста проверяют взаимодействие документа с настоящим базовым классом и наследниками, включая пересчёт общей длины после изменения строки.\par
+
+\Needspace{156bp}
+\LabHeading{TextDocumentIntegrationTest.java}
+
+\LabCodeFile[language=Java]{src/TextDocumentIntegrationTest.java}
+
+\Needspace{520bp}
+\LabHeading{6 Результаты тестирования}
+
+Сначала отдельно запущена проверка верхнего класса с заглушками. Все 4 теста прошли успешно.\par
+
+\Needspace{117bp}
+\LabHeading{Результат проверки TextDocument с программными заглушками}
+
+\LabCodeFile{results/stub-tests.txt}
+
+Затем запущен полный набор модульных и интеграционных тестов через JUnitCore из JUnit 4.13.2. Все 27 тестов прошли успешно.\par
+
+\Needspace{117bp}
+\LabHeading{Результат выполнения полного набора тестов}
+
+\LabCodeFile{results/all-tests.txt}
+
+\LabHeading{Вывод}
+
+Удалось научиться выполнять интеграционное тестирование ПО\par
+
+\end{document}

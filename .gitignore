@@ -1,0 +1,17 @@
+# Maven build outputs
+**/target/
+
+# LaTeX intermediate files
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+*.listing
+
+# Locally installed font files
+**/fonts/*.ttf
+**/fonts/*.otf
+**/__pycache__/

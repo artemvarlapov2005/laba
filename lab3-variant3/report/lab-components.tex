@@ -1,0 +1,195 @@
+% Общие компоненты единого шаблона. Настройки страницы — в mietlab.cls.
+% Все размеры шрифта задаются в bp: 1 bp = 1/72 дюйма, как pt в Word/PDF.
+\RequirePackage{fontspec}
+% Word-образец не применяет кернинг/лигатуры к этим строкам титульника.
+\defaultfontfeatures{Ligatures=NoCommon,Kerning=Off}
+\IfFileExists{fonts/times.ttf}{%
+  \setmainfont{times.ttf}[Path=fonts/,BoldFont=timesbd.ttf,
+    ItalicFont=timesi.ttf,BoldItalicFont=timesbi.ttf]
+  \setsansfont{times.ttf}[Path=fonts/,BoldFont=timesbd.ttf,
+    ItalicFont=timesi.ttf,BoldItalicFont=timesbi.ttf]
+  \setmonofont{times.ttf}[Path=fonts/,BoldFont=timesbd.ttf,
+    ItalicFont=timesi.ttf,BoldItalicFont=timesbi.ttf]
+}{%
+  \IfFontExistsTF{Times New Roman}{%
+    \setmainfont{Times New Roman}
+    \setsansfont{Times New Roman}
+    \setmonofont{Times New Roman}
+  }{%
+    \ClassError{mietlab}{Times New Roman is required}
+      {Install Times New Roman or put times.ttf, timesbd.ttf,
+       timesi.ttf, timesbi.ttf into the fonts/ folder. No substitute is used.}
+  }
+}
+\RequirePackage{polyglossia}
+\setdefaultlanguage{russian}
+\setotherlanguage{english}
+% Не задаём отдельные семейства для кириллицы: основной шрифт уже её содержит.
+% Это сохраняет и поддержку локальной папки fonts/ в Overleaf.
+
+\makeatletter
+\renewcommand\normalsize{%
+  \@setfontsize\normalsize{13bp}{19.5bp}%
+  \setbox\strutbox\hbox{\vrule height13bp depth6.5bp width0pt}%
+  \abovedisplayskip=0bp \belowdisplayskip=0bp
+  \abovedisplayshortskip=0bp \belowdisplayshortskip=0bp}
+\let\tiny\normalsize
+\let\scriptsize\normalsize
+\let\footnotesize\normalsize
+\let\small\normalsize
+\let\large\normalsize
+\let\Large\normalsize
+\let\LARGE\normalsize
+\let\huge\normalsize
+\let\Huge\normalsize
+\renewcommand\@makefnmark{\hbox{\raisebox{.45ex}{\normalfont\normalsize\@thefnmark}}}
+\makeatother
+\normalsize
+\linespread{1}
+\setlength\parindent{0bp}
+\setlength\parskip{0bp}
+\setlength\topskip{13bp}
+\setlength\emergencystretch{3em}
+\raggedbottom
+\frenchspacing
+\clubpenalty=10000
+\widowpenalty=10000
+
+\RequirePackage{ragged2e}
+\RequirePackage{array}
+\RequirePackage{longtable}
+\RequirePackage{graphicx}
+\RequirePackage{float}
+\RequirePackage{xcolor}
+\RequirePackage{caption}
+\RequirePackage{listings}
+\RequirePackage{textcomp}
+\RequirePackage[breakable,listings]{tcolorbox}
+\RequirePackage{needspace}
+\RequirePackage{enumitem}
+\RequirePackage{hyperref}
+\hypersetup{hidelinks,unicode=true,pdfcreator={XeLaTeX / mietlab}}
+\urlstyle{same}
+\setlength\intextsep{0bp}
+\setlength\textfloatsep{0bp}
+\setlength\floatsep{0bp}
+\setlist{font=\normalfont\normalsize,topsep=0bp,partopsep=0bp,
+  itemsep=0bp,parsep=0bp,leftmargin=1.25cm}
+
+% Заголовки — слева, полужирные, с тем же кеглем и интервалом.
+% Нет автоматически добавляемых номеров, отступов и пустых строк.
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{0pt}
+  {0bp}{1sp}{\normalfont\normalsize\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{0pt}
+  {0bp}{1sp}{\normalfont\normalsize\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{0pt}
+  {0bp}{1sp}{\normalfont\normalsize\bfseries}}
+\makeatother
+\setcounter{secnumdepth}{0}
+\newcommand\LabHeading[1]{\par\Needspace{39bp}\section*{#1}}
+\newcommand\LabLabel[2]{\par\noindent\textbf{#1:} #2\par}
+\newcommand\LabNewPage{\clearpage}
+
+% L принимает полную ширину столбца между линиями сетки, включая поля.
+% Для общей ширины \linewidth вычтите одну толщину линии в последнем L.
+\newcolumntype{L}[1]{>{\normalfont\justifying\arraybackslash
+  \hyphenpenalty=10000\exhyphenpenalty=10000
+  \setlength\parindent{0pt}\setlength\parskip{0pt}}
+  p{\dimexpr#1-2\tabcolsep-\arrayrulewidth\relax}}
+\newcolumntype{C}[1]{>{\normalfont\centering\arraybackslash
+  \hyphenpenalty=10000\exhyphenpenalty=10000}
+  p{\dimexpr#1-2\tabcolsep-\arrayrulewidth\relax}}
+\newcommand\LabTableHead[1]{\textbf{#1}}
+\newenvironment{labtable}[1]{%
+  \par\begingroup
+  \normalsize
+  \setlength\tabcolsep{5bp}%
+  \setlength\arrayrulewidth{0.5bp}%
+  \setlength\extrarowheight{0bp}%
+  \renewcommand\arraystretch{1}%
+  % Строка: 16 bp до базовой линии и 9.5 bp после неё, включая линии.
+  \setbox\strutbox\hbox{\vrule height15.75bp depth9.25bp width0pt}%
+  \setlength\LTpre{3bp}\setlength\LTpost{3bp}%
+  \setlength\LTleft{0bp}\setlength\LTright{\fill}%
+  \begin{longtable}{#1}%
+}{%
+  \end{longtable}\endgroup\par
+}
+
+% Подпись рисунка, как во втором PDF: по центру, снизу, обычный шрифт.
+\DeclareCaptionFont{labtext}{\normalfont\normalsize}
+\DeclareCaptionLabelSeparator{labdash}{\space—\space}
+\captionsetup{font=labtext,labelfont=labtext,textfont=labtext,
+  justification=centering,singlelinecheck=false,labelsep=labdash,
+  skip=7.25bp,belowskip=0bp,position=bottom}
+\gappto\captionsrussian{\renewcommand\figurename{Рисунок}}
+% Одна пустая строка перед изображением и после подписи.
+% Эти отступы находятся внутри блока рисунка и переносятся вместе с ним.
+\newlength\LabFigureOuterSkip
+\setlength\LabFigureOuterSkip{19.5bp}
+\newcommand\LabFigure[4][0.94\linewidth]{%
+  \begin{figure}[H]
+    \vspace*{\LabFigureOuterSkip}%
+    \centering
+    \includegraphics[width=#1,keepaspectratio]{#2}\par
+    \caption{#3}\label{#4}
+    \vspace*{\LabFigureOuterSkip}%
+  \end{figure}%
+}
+
+% Даже код — Times New Roman 13 bp, интервал 19.5 bp.
+% Пропорциональный шрифт обязателен по запросу; пробелы сохраняются.
+\definecolor{labcodebg}{RGB}{245,245,245}
+\newlength\LabCodePadding
+\setlength\LabCodePadding{4mm}
+\newlength\LabCodeOuterSkip
+\setlength\LabCodeOuterSkip{19.5bp}
+\lstdefinestyle{labcode}{%
+  basicstyle=\normalfont\normalsize,
+  keywordstyle=\normalfont\normalsize,
+  commentstyle=\normalfont\normalsize,
+  stringstyle=\normalfont\normalsize,
+  identifierstyle=\normalfont\normalsize,
+  numberstyle=\normalfont\normalsize,
+  % Фон и внутренние поля задаёт контейнер labcode, а не сам листинг.
+  backgroundcolor={},
+  columns=fullflexible,keepspaces=true,showstringspaces=false,upquote=true,
+  breaklines=true,breakatwhitespace=false,breakindent=0bp,
+  numbers=none,frame=none,tabsize=4,
+  aboveskip=0bp,belowskip=0bp,
+  xleftmargin=0bp,xrightmargin=0bp,
+  framesep=0bp,escapeinside={(*@}{@*)},
+  % listings увеличивает стандартный знак *; выводим его напрямую без масштаба.
+  literate={*}{{\char"002A}}1 {-}{{\char"002D}}1
+    {а}{{а}}1 {б}{{б}}1 {в}{{в}}1 {г}{{г}}1 {д}{{д}}1
+    {е}{{е}}1 {ё}{{ё}}1 {ж}{{ж}}1 {з}{{з}}1 {и}{{и}}1 {й}{{й}}1
+    {к}{{к}}1 {л}{{л}}1 {м}{{м}}1 {н}{{н}}1 {о}{{о}}1 {п}{{п}}1
+    {р}{{р}}1 {с}{{с}}1 {т}{{т}}1 {у}{{у}}1 {ф}{{ф}}1 {х}{{х}}1
+    {ц}{{ц}}1 {ч}{{ч}}1 {ш}{{ш}}1 {щ}{{щ}}1 {ъ}{{ъ}}1 {ы}{{ы}}1
+    {ь}{{ь}}1 {э}{{э}}1 {ю}{{ю}}1 {я}{{я}}1
+    {А}{{А}}1 {Б}{{Б}}1 {В}{{В}}1 {Г}{{Г}}1 {Д}{{Д}}1 {Е}{{Е}}1
+    {Ё}{{Ё}}1 {Ж}{{Ж}}1 {З}{{З}}1 {И}{{И}}1 {Й}{{Й}}1 {К}{{К}}1
+    {Л}{{Л}}1 {М}{{М}}1 {Н}{{Н}}1 {О}{{О}}1 {П}{{П}}1 {Р}{{Р}}1
+    {С}{{С}}1 {Т}{{Т}}1 {У}{{У}}1 {Ф}{{Ф}}1 {Х}{{Х}}1 {Ц}{{Ц}}1
+    {Ч}{{Ч}}1 {Ш}{{Ш}}1 {Щ}{{Щ}}1 {Ъ}{{Ъ}}1 {Ы}{{Ы}}1 {Ь}{{Ь}}1
+    {Э}{{Э}}1 {Ю}{{Ю}}1 {Я}{{Я}}1}
+\lstset{style=labcode}
+% Отдельный объект «код»: серый фон, поля 4 мм, перенос длинных строк
+% и возможность продолжения на следующей странице без уменьшения шрифта.
+\tcbset{lab code/.style={%
+  listing only,listing engine=listings,breakable,
+  % Иначе tcolorbox подавляет before skip сразу после заголовка.
+  ignore nobreak=true,
+  colback=labcodebg,colframe=labcodebg,boxrule=0pt,
+  arc=0pt,outer arc=0pt,boxsep=0pt,
+  left=\LabCodePadding,right=\LabCodePadding,
+  top=\LabCodePadding,bottom=\LabCodePadding,
+  before skip balanced=\LabCodeOuterSkip,
+  after skip balanced=\LabCodeOuterSkip,
+  left skip=10.7bp,right skip=3.8bp,
+  width=\dimexpr\linewidth-14.5bp\relax,
+  fontupper=\normalfont\normalsize}}
+\newtcblisting{labcode}[1][]{lab code,listing options={style=labcode,#1}}
+\newcommand\LabCodeFile[2][]{%
+  \tcbinputlisting{lab code,listing file={#2},listing options={style=labcode,#1}}}
